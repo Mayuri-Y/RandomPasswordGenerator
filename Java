@@ -1,0 +1,85 @@
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.security.SecureRandom;
+
+public class PasswordGeneratorApp {
+    private static final String UPPERCASE_LETTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    private static final String LOWERCASE_LETTERS = "abcdefghijklmnopqrstuvwxyz";
+    private static final String DIGITS = "0123456789";
+    private static final String SPECIAL_CHARACTERS = "!@#$%^&*()_-+=<>?";
+
+    private static SecureRandom random = new SecureRandom();
+
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(() -> {
+            createAndShowGUI();
+        });
+    }
+
+    private static void createAndShowGUI() {
+        JFrame frame = new JFrame("Password Generator");
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setSize(400, 200);
+        frame.setLayout(new GridLayout(4, 1));
+
+        JLabel lengthLabel = new JLabel("Password Length:");
+        JSpinner lengthSpinner = new JSpinner(new SpinnerNumberModel(12, 4, 128, 1));
+
+        JPanel optionsPanel = new JPanel();
+        JCheckBox includeUppercase = new JCheckBox("Uppercase Letters");
+        JCheckBox includeLowercase = new JCheckBox("Lowercase Letters");
+        JCheckBox includeNumbers = new JCheckBox("Numbers");
+        JCheckBox includeSpecialChars = new JCheckBox("Special Characters");
+        optionsPanel.add(includeUppercase);
+        optionsPanel.add(includeLowercase);
+        optionsPanel.add(includeNumbers);
+        optionsPanel.add(includeSpecialChars);
+
+        JTextArea passwordTextArea = new JTextArea();
+        passwordTextArea.setEditable(false);
+
+        JButton generateButton = new JButton("Generate Password");
+        generateButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                int length = (int) lengthSpinner.getValue();
+                StringBuilder characters = new StringBuilder();
+
+                if (includeUppercase.isSelected()) {
+                    characters.append(UPPERCASE_LETTERS);
+                }
+                if (includeLowercase.isSelected()) {
+                    characters.append(LOWERCASE_LETTERS);
+                }
+                if (includeNumbers.isSelected()) {
+                    characters.append(DIGITS);
+                }
+                if (includeSpecialChars.isSelected()) {
+                    characters.append(SPECIAL_CHARACTERS);
+                }
+
+                String password = generatePassword(characters.toString(), length);
+                passwordTextArea.setText(password);
+            }
+        });
+
+        frame.add(lengthLabel);
+        frame.add(lengthSpinner);
+        frame.add(optionsPanel);
+        frame.add(generateButton);
+        frame.add(passwordTextArea);
+
+        frame.setVisible(true);
+    }
+
+    private static String generatePassword(String characters, int length) {
+        StringBuilder password = new StringBuilder();
+        for (int i = 0; i < length; i++) {
+            int randomIndex = random.nextInt(characters.length());
+            password.append(characters.charAt(randomIndex));
+        }
+        return password.toString();
+    }
+}
